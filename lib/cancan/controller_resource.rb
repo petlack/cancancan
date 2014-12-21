@@ -150,6 +150,7 @@ module CanCan
       when false  then name.to_sym
       when nil    then namespaced_name.to_s.camelize.constantize
       when String then @options[:class].constantize
+      when Proc   then @options[:class].call(self)
       else @options[:class]
       end
     end
@@ -273,7 +274,11 @@ module CanCan
     end
 
     def instance_name
-      @options[:instance_name] || name
+      case @options[:instance_name]
+        when String then @options[:instance_name]
+        when Proc then @options[:instance_name].call(self)
+        else name
+      end
     end
 
     def collection_actions
